@@ -11,9 +11,8 @@ Requirements
 
 Examples
 ========
-
 Print Last Hours Worth of OHLC
-[code]
+```python
 from Cryptsy import Cryptsy
 from pprint import pprint
 import time
@@ -21,26 +20,26 @@ import time
 c = Cryptsy("", "")
 ohlc = c.market_ohlc(132, start=0, stop=time.time(), interval="minute", limit=60)
 pprint(ohlc)
-[/code]
+```
 
 
 List Currencies
-[code]
+```python
 from Cryptsy import Cryptsy
 from pprint import pprint
 
 c = Cryptsy("", "")
 currencies = c.currencies()
 pprint(currencies)
-[/code]
+```
 
 
 Create Converter Quote with 2% fee.
-[code]
+```python
 from Cryptsy import Cryptsy
 from pprint import pprint
 
 c = Cryptsy("", "")
 quote = c.convert_create(3, 132, sendingamount=1, tradekey="", feepercent=2)
 pprint(quote)
-[/code]
+```
