@@ -1,8 +1,11 @@
+from __future__ import print_function
 import requests
 import json
 import time
 import hmac,hashlib
 import logging
+import codecs
+
 logging.getLogger("requests").setLevel(logging.NOTSET)
 
 class Cryptsy:
@@ -21,24 +24,39 @@ class Cryptsy:
 
         query['nonce'] = time.time()
         link = 'https://' + self.domain + route
-        sign = hmac.new(self.PrivateKey, route, hashlib.sha512).hexdigest()
-        headers = {'Sign': sign, 'Key': self.PublicKey}
+        sign = hmac.new(self.PrivateKey.encode('utf-8'),
+                        route.encode('utf-8'),
+                        hashlib.sha512).hexdigest()
+        headers = {'Sign': sign, 'Key': self.PublicKey.encode('utf-8')}
 
         if(get_method == "PUT"):
-            ret = requests.put(link, params=query, headers=headers, verify=False)
+            ret = requests.put(link,
+                               params=query,
+                               headers=headers,
+                               verify=False)
         elif(get_method == "DELETE"):
-            ret = requests.delete(link, params=query, headers=headers, verify=False)
+            ret = requests.delete(link,
+                                  params=query,
+                                  headers=headers,
+                                  verify=False)
         elif(get_method == "POST"):
-            ret = requests.post(link, params=query, headers=headers, verify=False)
+            ret = requests.post(link,
+                                params=query,
+                                headers=headers,
+                                verify=False)
         else:
-            ret = requests.get(link, params=query, headers=headers, verify=False)
+            ret = requests.get(link,
+                               params=query,
+                               headers=headers,
+                               verify=False)
 
         try:
-            jsonRet = json.loads(ret.content)
+            jsonRet = ret.json()
             return jsonRet
-        except ValueError, ex:
-            print ret.content
-            return {"success": False, "error": {"ValueError": ["Could not load json string."]}}
+        except ValueError:
+            print(ret.content)
+            return {"success": False,
+                    "error": {"ValueError": ["Could not load json string."]}}
 
 
     # Markets
@@ -60,14 +78,18 @@ class Cryptsy:
         return self._query(method="markets", id=id, action="triggers",
             query={"limit": limit})
 
-    def market_ohlc(self, id, start=0, stop=time.time(), interval="minute", limit=100):
+    def market_ohlc(self, id, start=0, stop=time.time(),
+                                            interval="minute", limit=100):
         intervals = ["minute", "hour", "day"]
         if(interval not in intervals):
             interval = intervals[0]
-        return self._query(method="markets", id=id, action="ohlc",
-            query={"start": start, "stop": stop,
-                    "interval": interval,
-                    "limit": limit})
+        return self._query(method="markets",
+                           id=id,
+                           action="ohlc",
+                           query={"start": start,
+                                  "stop": stop,
+                                  "interval": interval,
+                                  "limit": limit})
 
 
     # Currencies
@@ -90,12 +112,16 @@ class Cryptsy:
 
     def deposits(self, id=0, limit=100):
         if(id != 0):
-            return self._query(method="deposits", id=id, query={"limit", limit})
+            return self._query(method="deposits",
+                               id=id,
+                               query={"limit", limit})
         return self._query(method="deposits", query={"limit": limit})
 
     def withdrawals(self, id=0, limit=100):
         if(id != 0):
-            return self._query(method="withdrawals", id=id, query={"limit", limit})
+            return self._query(method="withdrawals",
+                               id=id,
+                               query={"limit", limit})
         return self._query(method="withdrawals", query={"limit": limit})
 
     def addresses(self):
@@ -113,7 +139,7 @@ class Cryptsy:
         return self._query(method="order", id=id)
 
     def order_create(self, marketid, quantity, ordertype, price):
-        return self._query(method="order", query={"marketid": marketid, 
+        return self._query(method="order", query={"marketid": marketid,
                                                     "quantity": quantity,
                                                     "ordertype": ordertype,
                                                     "price": price},
@@ -127,34 +153,33 @@ class Cryptsy:
     def trigger(self, id):
         return self._query(method="trigger", id=id)
 
-    def trigger_create(self, marketid, ordertype, quantity, comparison, price, orderprice, expires=''):
-        return self._query(method="trigger", query={"marketid": marketid, 
-                                                    "type": ordertype, 
-                                                    "quantity": quantity, 
-                                                    "comparison": comparison, 
-                                                    "price": price, 
-                                                    "orderprice": orderprice,
-                                                    "expires": expires},
-                                            get_method="POST")
+    def trigger_create(self, marketid, ordertype, quantity,
+                                   comparison, price, orderprice, expires=''):
+        return self._query(method="trigger",
+                           query={"marketid": marketid,
+                                  "type": ordertype,
+                                  "quantity": quantity,
+                                  "comparison": comparison,
+                                  "price": price,
+                                  "orderprice": orderprice,
+                                  "expires": expires},
+                           get_method="POST")
 
     def trigger_remove(self, id):
         return self._query(method="trigger", id=id, get_method="DELETE")
 
 
     # Converter
-
     def convert(self, id):
         return self._query(method="converter", id=id)
 
-    def convert_create(self, fromcurrency, tocurrency, sendingamount=0.0, receivingamount=0.0, tradekey="", feepercent=0.0):
-        return self._query(method="converter", query={"fromcurrency": fromcurrency, 
-                                                    "tocurrency": tocurrency, 
-                                                    "sendingamount": sendingamount, 
-                                                    "receivingamount": receivingamount, 
-                                                    "tradekey": tradekey, 
-                                                    "feepercent": feepercent},
-                                            get_method="POST")
-
-
-
-
+    def convert_create(self, fromcurrency, tocurrency, sendingamount=0.0,
+                            receivingamount=0.0, tradekey="", feepercent=0.0):
+        return self._query(method="converter",
+                           query={"fromcurrency": fromcurrency,
+                                  "tocurrency": tocurrency,
+                                  "sendingamount": sendingamount,
+                                  "receivingamount": receivingamount,
+                                  "tradekey": tradekey,
+                                  "feepercent": feepercent},
+                           get_method="POST")
