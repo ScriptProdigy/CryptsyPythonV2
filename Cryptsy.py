@@ -1,10 +1,7 @@
-from __future__ import print_function
 import requests
-import json
 import time
 import hmac,hashlib
 import logging
-import codecs
 
 logging.getLogger("requests").setLevel(logging.NOTSET)
 
@@ -54,7 +51,6 @@ class Cryptsy:
             jsonRet = ret.json()
             return jsonRet
         except ValueError:
-            print(ret.content)
             return {"success": False,
                     "error": {"ValueError": ["Could not load json string."]}}
 
