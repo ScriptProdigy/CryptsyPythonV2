@@ -2,6 +2,7 @@ import requests
 import time
 import hmac,hashlib
 import logging
+import urllib
 
 logging.getLogger("requests").setLevel(logging.NOTSET)
 
@@ -22,7 +23,7 @@ class Cryptsy:
         query['nonce'] = time.time()
         link = 'https://' + self.domain + route
         sign = hmac.new(self.PrivateKey.encode('utf-8'),
-                        route.encode('utf-8'),
+                        urllib.urlencode(query).encode('utf-8'),
                         hashlib.sha512).hexdigest()
         headers = {'Sign': sign, 'Key': self.PublicKey.encode('utf-8')}
 
@@ -46,7 +47,6 @@ class Cryptsy:
                                params=query,
                                headers=headers,
                                verify=False)
-
         try:
             jsonRet = ret.json()
             return jsonRet
