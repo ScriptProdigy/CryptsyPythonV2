@@ -20,10 +20,12 @@ class Cryptsy:
             if(action != None):
                 route = route + "/" + str(action)
 
-        query['nonce'] = time.time()
+        query.append(('nonce', time.time()))
+        queryStr = urllib.urlencode(query)
+        print queryStr
         link = 'https://' + self.domain + route
         sign = hmac.new(self.PrivateKey.encode('utf-8'),
-                        urllib.urlencode(query).encode('utf-8'),
+                        queryStr,
                         hashlib.sha512).hexdigest()
         headers = {'Sign': sign, 'Key': self.PublicKey.encode('utf-8')}
 
@@ -47,6 +49,7 @@ class Cryptsy:
                                params=query,
                                headers=headers,
                                verify=False)
+        print ret.text
         try:
             jsonRet = ret.json()
             return jsonRet
@@ -64,15 +67,15 @@ class Cryptsy:
 
     def market_orderbook(self, id, limit=100, otype="both", mine=False):
         return self._query(method="markets", id=id, action="orderbook",
-            query={"limit": limit, "type": otype, "mine": mine})
+            query=[("limit", limit), ("type", otype), ("mine", mine)])
 
     def market_tradehistory(self, id, limit=100, mine=False):
         return self._query(method="markets", id=id, action="tradehistory",
-            query={"limit": limit, "mine": mine})
+            query=[("limit", limit), ("mine", mine)])
 
     def market_triggers(self, id, limit=100):
         return self._query(method="markets", id=id, action="triggers",
-            query={"limit": limit})
+            query=[("limit", limit)])
 
     def market_ohlc(self, id, start=0, stop=time.time(),
                                             interval="minute", limit=100):
@@ -82,10 +85,10 @@ class Cryptsy:
         return self._query(method="markets",
                            id=id,
                            action="ohlc",
-                           query={"start": start,
-                                  "stop": stop,
-                                  "interval": interval,
-                                  "limit": limit})
+                           query=[("start", start),
+                                  ("stop", stop),
+                                  ("interval", interval),
+                                  ("limit", limit)])
 
 
     # Currencies
@@ -101,24 +104,24 @@ class Cryptsy:
 
     # User
     def balances(self, btype="all"):
-        return self._query(method="balances", query={"type": btype})
+        return self._query(method="balances", query=[("type", btype)])
 
     def balance(self, id, btype="all"):
-        return self._query(method="balances", id=id, query={"type": btype})
+        return self._query(method="balances", id=id, query=[("type", btype)])
 
     def deposits(self, id=0, limit=100):
         if(id != 0):
             return self._query(method="deposits",
                                id=id,
-                               query={"limit", limit})
-        return self._query(method="deposits", query={"limit": limit})
+                               query=[("limit", limit)])
+        return self._query(method="deposits", query=[("limit", limit)])
 
     def withdrawals(self, id=0, limit=100):
         if(id != 0):
             return self._query(method="withdrawals",
                                id=id,
-                               query={"limit", limit})
-        return self._query(method="withdrawals", query={"limit": limit})
+                               query=[("limit", limit)])
+        return self._query(method="withdrawals", query=[("limit", limit)])
 
     def addresses(self):
         return self._query(method="addresses")
@@ -127,7 +130,7 @@ class Cryptsy:
         return self._query(method="addresses", id=id)
 
     def transfers(self, limit=100):
-        return self._query(method="transfers", query={"limit": limit})
+        return self._query(method="transfers", query=[("limit", limit)])
 
 
     # Orders
@@ -135,10 +138,10 @@ class Cryptsy:
         return self._query(method="order", id=id)
 
     def order_create(self, marketid, quantity, ordertype, price):
-        return self._query(method="order", query={"marketid": marketid,
-                                                    "quantity": quantity,
-                                                    "ordertype": ordertype,
-                                                    "price": price},
+        return self._query(method="order", query=[("quantity", quantity),
+                                                    ("ordertype", ordertype),
+                                                    ("price", price),
+                                                    ("marketid", marketid)],
                                             get_method="POST")
 
     def order_remove(self, id):
@@ -152,13 +155,13 @@ class Cryptsy:
     def trigger_create(self, marketid, ordertype, quantity,
                                    comparison, price, orderprice, expires=''):
         return self._query(method="trigger",
-                           query={"marketid": marketid,
-                                  "type": ordertype,
-                                  "quantity": quantity,
-                                  "comparison": comparison,
-                                  "price": price,
-                                  "orderprice": orderprice,
-                                  "expires": expires},
+                           query=[("marketid", marketid),
+                                  ("type", ordertype),
+                                  ("quantity", quantity),
+                                  ("comparison", comparison),
+                                  ("price", price),
+                                  ("orderprice", orderprice),
+                                  ("expires", expires)],
                            get_method="POST")
 
     def trigger_remove(self, id):
@@ -172,10 +175,10 @@ class Cryptsy:
     def convert_create(self, fromcurrency, tocurrency, sendingamount=0.0,
                             receivingamount=0.0, tradekey="", feepercent=0.0):
         return self._query(method="converter",
-                           query={"fromcurrency": fromcurrency,
-                                  "tocurrency": tocurrency,
-                                  "sendingamount": sendingamount,
-                                  "receivingamount": receivingamount,
-                                  "tradekey": tradekey,
-                                  "feepercent": feepercent},
+                           query=[("fromcurrency", fromcurrency),
+                                  ("tocurrency", tocurrency),
+                                  ("sendingamount", sendingamount),
+                                  ("receivingamount", receivingamount),
+                                  ("tradekey", tradekey),
+                                  ("feepercent", feepercent)],
                            get_method="POST")
