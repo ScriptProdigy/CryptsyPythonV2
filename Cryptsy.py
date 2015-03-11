@@ -12,7 +12,7 @@ class Cryptsy:
         self.PublicKey = PublicKey
         self.PrivateKey = PrivateKey
 
-    def _query(self, method, id=None, action=None, query={}, get_method="GET"):
+    def _query(self, method, id=None, action=None, query=[], get_method="GET"):
 
         route = "/api/v2/" + method
         if(id != None):
@@ -22,7 +22,6 @@ class Cryptsy:
 
         query.append(('nonce', time.time()))
         queryStr = urllib.urlencode(query)
-        print queryStr
         link = 'https://' + self.domain + route
         sign = hmac.new(self.PrivateKey.encode('utf-8'),
                         queryStr,
