@@ -48,7 +48,6 @@ class Cryptsy:
                                params=query,
                                headers=headers,
                                verify=False)
-        print ret.text
         try:
             jsonRet = ret.json()
             return jsonRet
@@ -145,6 +144,25 @@ class Cryptsy:
 
     def order_remove(self, id):
         return self._query(method="order", id=id, get_method="DELETE")
+
+    def order_move(self, id, price=False, quantity=False):
+        if(price == False and quantity == False):
+            return False
+
+        query = []
+        if(not isinstance(quantity, bool)):
+            if(isinstance(quantity, float) or isinstance(quantity, int)):
+                query.append(("quantity", quantity))
+
+        if(not isinstance(price, bool)):
+            if(isinstance(price, float) or isinstance(price, int)):
+                query.append(("price", price))
+
+        print query
+
+        return self._query(method="order", id="move", action=id, 
+                                            query=query, 
+                                            get_method="GET")
 
 
     # Triggers
