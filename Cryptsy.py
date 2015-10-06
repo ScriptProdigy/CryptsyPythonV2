@@ -135,11 +135,11 @@ class Cryptsy:
     def order(self, obj_id):
         return self._query(method="order", obj_id=obj_id)
 
-    def order_create(self, marketobj_id, quantity, ordertype, price):
+    def order_create(self, marketid, quantity, ordertype, price):
         return self._query(method="order", query=[("quantity", quantity),
                                                     ("ordertype", ordertype),
                                                     ("price", price),
-                                                    ("marketobj_id", marketobj_id)],
+                                                    ("marketid", marketid)],
                                             get_method="POST")
 
     def order_remove(self, obj_id):
@@ -168,10 +168,10 @@ class Cryptsy:
     def trigger(self, obj_id):
         return self._query(method="trigger", obj_id=obj_id)
 
-    def trigger_create(self, market_id, ordertype, quantity,
+    def trigger_create(self, marketid, ordertype, quantity,
                                    comparison, price, orderprice, expires=''):
         return self._query(method="trigger",
-                           query=[("market_id", market_id),
+                           query=[("marketid", marketid),
                                   ("type", ordertype),
                                   ("quantity", quantity),
                                   ("comparison", comparison),
