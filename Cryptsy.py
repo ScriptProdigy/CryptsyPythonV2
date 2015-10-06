@@ -147,7 +147,8 @@ class Cryptsy:
 
     def order_move(self, id, price=False, quantity=False):
         if(price == False and quantity == False):
-            return False
+            return {"success": False,
+                    "error": {"ValueError": ["Must supply price and or quantity."]}}
 
         query = []
         if(not isinstance(quantity, bool)):
@@ -158,9 +159,7 @@ class Cryptsy:
             if(isinstance(price, float) or isinstance(price, int)):
                 query.append(("price", price))
 
-        print query
-
-        return self._query(method="order", id="move", action=id, 
+        return self._query(method="order", id=id, action="move", 
                                             query=query, 
                                             get_method="GET")
 
